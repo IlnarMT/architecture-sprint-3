@@ -1,0 +1,76 @@
+@startuml
+title DeviceManagement Service Code Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+class HeatingDeviceUpdateRequestDto {
+   +UUID id
+   +boolean isEnabled
+   +double targetTemperature
+}
+
+class HeatingDeviceController {
+    HeatingDeviceResponseDto getHeatingSystem(Long id)
+    updateHeatingSystem(Long id, HeatingDeviceUpdateRequestDto dto)
+}
+
+class HeatingDevice {
+  +UUID id
+  +boolean isEnabled
+  +double targetTemperature
+  -double currentTemperature
+  +isEnabled
+  +void enable()
+  +void disable()
+  +void setTargetTemperature(long temperature)
+  +double getCurrentTemperature()
+}
+
+class HeatingService {
+  +save(HeatingDevice device)
+  +HeatingDevice get(UUID id)
+  +setTargetTemperature(long temperature)
+  +delete(UUID id)
+}
+
+class HeatingDeviceCommand {
+    +UUID: device_id
+    +double targetTemperature
+}
+
+class HeatingDeviceMapper {
+    +HeatingDevice mapToHeatingDevice(HeatingDeviceUpdateRequestDto dto)
+    +HeatingDeviceEntity toEntity(HeatingDevice device)
+    +HeatingDeviceCommand mapToHeatingDeviceCommand(HeatingDevice device)
+}
+
+class HeatingDeviceStorage {
+    +save(HeatingDevice device)
+}
+
+class DeviceClientAdapter {
+    +send(HeatingDevice device)
+}
+
+class DeviceMqttClient {
+    +send(HeatingDeviceCommand command)
+}
+
+class HeatingDeviceRepository {
+    +save(HeatingDeviceEntity  entity)
+}
+
+HeatingDeviceController " " -- " " HeatingDeviceMapper
+HeatingDeviceController " " -- " " HeatingService
+
+HeatingService " " -- " " HeatingDeviceStorage
+HeatingService " " -- " " DeviceClientAdapter
+
+HeatingDeviceStorage " " -- " " HeatingDeviceRepository
+HeatingDeviceStorage " " -- " " HeatingDeviceMapper
+
+DeviceClientAdapter " " -- " " DeviceMqttClient
+DeviceClientAdapter " " -- " " HeatingDeviceMapper
+@enduml
