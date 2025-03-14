@@ -1,0 +1,60 @@
+@startuml
+title DeviceManagement ER Diagram
+
+entity home {
+    uuid: id
+    text: name
+    text: description
+    date: created_at
+}
+
+entity user {
+    uuid: id
+    text: fio
+    text: login
+
+}
+
+entity device_type {
+    uuid: id
+    text: name
+}
+
+entity device {
+    uuid: id
+    text: name
+    uuid: type_id
+    text: serial_number
+    enum: status
+    uuid: home_id
+    datetime: last_active_datetime
+    uuid: device_id
+    boolean: is_enabled
+    double: current_temperature
+    double: target_temperature
+}
+
+entity heating_device_params {
+    uuid: device_id
+    boolean: is_enabled
+    double: current_temperature
+    double: target_temperature
+}
+
+entity user_device_link {
+    uuid: user_id
+    uuid: device_id
+}
+
+entity lighting_device_params {
+    uuid: device_id
+    boolean: is_enabled
+}
+
+home "1..*" -- "0..*" device
+device "1..*" -- "0..*" user_device_link
+user "1" -- "0..*" user_device_link
+device "1" -- "1" device_type
+device "1" -- "1" heating_device_params
+device "1" -- "1" lighting_device_params
+@enduml
